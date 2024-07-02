@@ -55,15 +55,15 @@ int main()
 			setbkcolor(0xe6e6e6);
 
 			int r0 = 180, r1 = 222, r2 = 230;
-			int fontWeight = 30, fontHeight = 50;
-			settextstyle(fontHeight, fontWeight, L"宋体");
+			int fontWidth = 30, fontHeight = 50;
+			settextstyle(fontHeight, fontWidth, L"宋体");
 			for (int i = 0; i < 60; i++) {
 				double t = 2 * PI * i / 60 - PI / 3;
 				if (i % 5 == 0) {
 					// 绘制表盘
 					wchar_t text[3];
 					wsprintf(text, L"%d", i / 5 + 1);
-					double offsetX = fontWeight / 2.0, offsetY = fontHeight / 2.0;
+					double offsetX = fontWidth / 2.0, offsetY = fontHeight / 2.0;
 					if (lstrlen(text) > 1) {
 						offsetX *= 2;
 					}
