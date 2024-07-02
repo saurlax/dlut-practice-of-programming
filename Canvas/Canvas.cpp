@@ -22,6 +22,11 @@ int main()
 
 	cleardevice();
 
+	outtextxy(20, 20, L"Canvas");
+	outtextxy(20, 60, L"LMOUSE: SQUARE    RMOUSE: CIRCLE");
+	outtextxy(20, 80, L"R: RED    G: GREEN    B: BLUE    W: WHITE");
+	outtextxy(20, 100, L"C: CLEAR    ESC: ESCAPE    CTRL: THICKEN");
+
 	while (running) {
 		while (peekmessage(&msg)) {
 			if (msg.message == WM_CLOSE) running = false;
