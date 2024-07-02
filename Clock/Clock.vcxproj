@@ -22,7 +22,7 @@
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{5e7ddcb5-c6bd-4fd7-9971-4b239bf8c277}</ProjectGuid>
-    <RootNamespace>week1</RootNamespace>
+    <RootNamespace>Clock</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
