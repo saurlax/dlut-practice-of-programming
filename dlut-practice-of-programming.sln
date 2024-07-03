@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Canvas", "Canvas\Canvas.vcx
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Pinball", "Pinball\Pinball.vcxproj", "{668D25C4-38BF-4C78-BF84-AD09E6F7F53E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Miner", "Miner\Miner.vcxproj", "{4F6F393C-8BDE-4FDF-BEBE-BC72A26AE975}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -41,6 +43,14 @@ Global
 		{668D25C4-38BF-4C78-BF84-AD09E6F7F53E}.Release|x64.Build.0 = Release|x64
 		{668D25C4-38BF-4C78-BF84-AD09E6F7F53E}.Release|x86.ActiveCfg = Release|Win32
 		{668D25C4-38BF-4C78-BF84-AD09E6F7F53E}.Release|x86.Build.0 = Release|Win32
+		{4F6F393C-8BDE-4FDF-BEBE-BC72A26AE975}.Debug|x64.ActiveCfg = Debug|x64
+		{4F6F393C-8BDE-4FDF-BEBE-BC72A26AE975}.Debug|x64.Build.0 = Debug|x64
+		{4F6F393C-8BDE-4FDF-BEBE-BC72A26AE975}.Debug|x86.ActiveCfg = Debug|Win32
+		{4F6F393C-8BDE-4FDF-BEBE-BC72A26AE975}.Debug|x86.Build.0 = Debug|Win32
+		{4F6F393C-8BDE-4FDF-BEBE-BC72A26AE975}.Release|x64.ActiveCfg = Release|x64
+		{4F6F393C-8BDE-4FDF-BEBE-BC72A26AE975}.Release|x64.Build.0 = Release|x64
+		{4F6F393C-8BDE-4FDF-BEBE-BC72A26AE975}.Release|x86.ActiveCfg = Release|Win32
+		{4F6F393C-8BDE-4FDF-BEBE-BC72A26AE975}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
