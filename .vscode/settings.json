@@ -1,9 +1,0 @@
-{
-  "files.associations": {
-    "*.art": "html",
-    "*.njk": "html",
-    "*.env": "properties",
-    ".gdb_history": "plaintext",
-    "*.rh": "cpp"
-  }
-}
