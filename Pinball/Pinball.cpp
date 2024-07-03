@@ -121,11 +121,13 @@ int main()
 			}
 		}
 
+		double speed = sqrt(balldX * balldX + balldY * balldY);
+
 		BeginBatchDraw();
 
 		cleardevice();
-		wchar_t text[25];
-		swprintf(text, 25, L"FPS: %.2f    SCORE: %d", fps, score);
+		wchar_t text[50];
+		swprintf(text, 50, L"FPS: %.1f    SCORE: %d    SPEED: %.2f", fps, score, speed);
 		outtextxy(0,0, text);
 
 		setfillcolor(WHITE);
