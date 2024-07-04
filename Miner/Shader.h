@@ -22,7 +22,10 @@ class Shader {
   int count;
 
  public:
+  DWORD* surface;
+  int width;
+  int height;
   void PushVAO(std::initializer_list<float> values);
   void ClearVAO();
-  void Draw(DWORD* surface, int width, int height);
+  void Draw();
 };

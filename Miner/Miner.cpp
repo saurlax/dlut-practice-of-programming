@@ -40,6 +40,9 @@ void init() {
   Block::Create(&Texture::byId[1], &Texture::byId[0], &Texture::byId[2]);
   Block::Create(&Texture::byId[0]);
   surface = GetImageBuffer();
+  shader.width = WINDOW_WIDTH;
+  shader.height = WINDOW_HEIGHT;
+  shader.surface = surface;
 
   printf("[init] done\n");
 }
@@ -63,7 +66,7 @@ void update(int last) {}
 void render(int last) {
   shader.PushVAO({0.25, 0, 0, 0.75, 0, 0, 1, 1, 0, 0, 1, 0, 0});
   BeginBatchDraw();
-  shader.Draw(surface, WINDOW_WIDTH, WINDOW_HEIGHT);
+  shader.Draw();
   wchar_t text[100];
   swprintf(text, 100, L"FPS: %d", 1000 / last);
   outtextxy(0, 0, text);

@@ -27,7 +27,7 @@ void Shader::PushVAO(std::initializer_list<float> values) {
 
 void Shader::ClearVAO() { count = 0; }
 
-void Shader::Draw(DWORD* surface, int width, int height) {
+void Shader::Draw() {
   for (int offset = 0; offset < count; offset += 13) {
     Vec3 a = {VAO[offset + 0], VAO[offset + 1], VAO[offset + 2]};
     Vec3 b = {VAO[offset + 3], VAO[offset + 4], VAO[offset + 5]};
