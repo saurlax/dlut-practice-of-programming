@@ -61,7 +61,7 @@ void input() {
 void update(int last) {}
 
 void render(int last) {
-  shader.PushVAO({0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 0, 2});
+  shader.PushVAO({0.25, 0, 0, 0.75, 0, 0, 1, 1, 0, 0, 1, 0, 0});
   BeginBatchDraw();
   shader.Draw(surface, WINDOW_WIDTH, WINDOW_HEIGHT);
   wchar_t text[100];

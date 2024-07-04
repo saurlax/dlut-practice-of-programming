@@ -29,21 +29,26 @@ void Shader::ClearVAO() { count = 0; }
 
 void Shader::Draw(DWORD* surface, int width, int height) {
   for (int offset = 0; offset < count; offset += 13) {
-    Vec3 base = Vec3(VAO[offset], VAO[offset + 1], VAO[offset + 2]);
-    Vec3 u = Vec3(VAO[offset + 3], VAO[offset + 4], VAO[offset + 5]) - base;
-    Vec3 v = Vec3(VAO[offset + 6], VAO[offset + 7], VAO[offset + 8]) - base;
+    Vec3 a = {VAO[offset + 0], VAO[offset + 1], VAO[offset + 2]};
+    Vec3 b = {VAO[offset + 3], VAO[offset + 4], VAO[offset + 5]};
+    Vec3 c = {VAO[offset + 6], VAO[offset + 7], VAO[offset + 8]};
+    Vec3 d = {VAO[offset + 9], VAO[offset + 10], VAO[offset + 11]};
     Texture& texture = Texture::byId[(int)VAO[offset + 12]];
-    POINT points[4];
     for (int x = 0; x < 16; x++) {
       for (int y = 0; y < 16; y++) {
-        Vec3 from = base + u * x / 16 + v * y / 16;
-        Vec3 toX = base + u * (x + 1) / 16 + v * y / 16;
-        Vec3 toY = base + u * x / 16 + v * (y + 1) / 16;
-        Vec3 to = base + u * (x + 1) / 16 + v * (y + 1) / 16;
-        points[0] = {(int)(width * from[0]), (int)(height * from[1])};
-        points[1] = {(int)(width * toX[0]), (int)(height * toX[1])};
-        points[2] = {(int)(width * to[0]), (int)(height * to[1])};
-        points[3] = {(int)(width * toY[0]), (int)(height * toY[1])};
+        float u1 = x / 16.0f;
+        float v1 = y / 16.0f;
+        float u2 = (x + 1) / 16.0f;
+        float v2 = (y + 1) / 16.0f;
+        Vec3 p1 = a + (b - a) * u1 + (d - a) * v1 + (a - b + c - d) * u1 * v1;
+        Vec3 p2 = a + (b - a) * u2 + (d - a) * v1 + (a - b + c - d) * u2 * v1;
+        Vec3 p3 = a + (b - a) * u2 + (d - a) * v2 + (a - b + c - d) * u2 * v2;
+        Vec3 p4 = a + (b - a) * u1 + (d - a) * v2 + (a - b + c - d) * u1 * v2;
+        POINT points[4];
+        points[0] = {(int)(width * p1[0]), (int)(height * p1[1])};
+        points[1] = {(int)(width * p2[0]), (int)(height * p2[1])};
+        points[2] = {(int)(width * p3[0]), (int)(height * p3[1])};
+        points[3] = {(int)(width * p4[0]), (int)(height * p4[1])};
         setfillcolor(BGR(texture(x, y) & 0xffffff));
         solidpolygon(points, 4);
       }
