@@ -11,12 +11,13 @@
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
-#define FPS_MAX 100
+#define FPS_MAX 60
 
 HWND hwnd;
 DWORD* surface;
 ExMessage msg;
 ULONGLONG tick;
+Shader shader;
 
 bool running = true;
 
@@ -60,15 +61,11 @@ void input() {
 void update(int last) {}
 
 void render(int last) {
+  shader.PushVAO({0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 0, 2});
   BeginBatchDraw();
-  for (int x = 0; x < WINDOW_WIDTH; x++) {
-    for (int y = 0; y < WINDOW_HEIGHT; y++) {
-      surface[y * WINDOW_WIDTH + x] = rand();
-    }
-  }
-
+  shader.Draw(surface, WINDOW_WIDTH, WINDOW_HEIGHT);
   wchar_t text[100];
-  swprintf(text, 100, L"FPS: %d", last);
+  swprintf(text, 100, L"FPS: %d", 1000 / last);
   outtextxy(0, 0, text);
   FlushBatchDraw();
 }

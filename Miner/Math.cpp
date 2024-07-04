@@ -7,15 +7,22 @@ Vec3::Vec3(float x, float y, float z) {
   data[1] = y;
   data[2] = z;
 }
+float Vec3::operator[](int index) const { return data[index]; }
 
 Vec3 Vec3::operator+(const Vec3& other) const {
-  return Vec3(data[0] + other.data[0], data[1] + other.data[1],
-              data[2] + other.data[2]);
+  return Vec3(data[0] + other[0], data[1] + other[1], data[2] + other[2]);
 }
 
 Vec3 Vec3::operator-(const Vec3& other) const {
-  return Vec3(data[0] - other.data[0], data[1] - other.data[1],
-              data[2] - other.data[2]);
+  return Vec3(data[0] - other[0], data[1] - other[1], data[2] - other[2]);
+}
+
+Vec3 Vec3::operator*(float scalar) const {
+  return Vec3(data[0] * scalar, data[1] * scalar, data[2] * scalar);
+}
+
+Vec3 Vec3::operator/(float scalar) const {
+  return Vec3(data[0] / scalar, data[1] / scalar, data[2] / scalar);
 }
 
 Vec3 Vec3::normalize() const {
@@ -24,10 +31,10 @@ Vec3 Vec3::normalize() const {
   return Vec3(data[0] / length, data[1] / length, data[2] / length);
 }
 
-Vec3 Vec3::cross(Vec3 other) const {
-  return Vec3(data[1] * other.data[2] - data[2] * other.data[1],
-              data[2] * other.data[0] - data[0] * other.data[2],
-              data[0] * other.data[1] - data[1] * other.data[0]);
+Vec3 Vec3::cross(const Vec3& other) const {
+  return Vec3(data[1] * other[2] - data[2] * other[1],
+              data[2] * other[0] - data[0] * other[2],
+              data[0] * other[1] - data[1] * other[0]);
 }
 
 Vec4::Vec4(float x, float y, float z, float w) {
@@ -37,14 +44,16 @@ Vec4::Vec4(float x, float y, float z, float w) {
   data[3] = w;
 }
 
+float Vec4::operator[](int index) const { return data[index]; }
+
 Vec4 Vec4::operator+(const Vec4& other) const {
-  return Vec4(data[0] + other.data[0], data[1] + other.data[1],
-              data[2] + other.data[2], data[3] + other.data[3]);
+  return Vec4(data[0] + other[0], data[1] + other[1], data[2] + other[2],
+              data[3] + other[3]);
 }
 
 Vec4 Vec4::operator-(const Vec4& other) const {
-  return Vec4(data[0] - other.data[0], data[1] - other.data[1],
-              data[2] - other.data[2], data[3] - other.data[3]);
+  return Vec4(data[0] - other[0], data[1] - other[1], data[2] - other[2],
+              data[3] - other[3]);
 }
 
 Vec4 Vec4::operator*(const Mat4& m) const {
@@ -52,7 +61,7 @@ Vec4 Vec4::operator*(const Mat4& m) const {
   for (int i = 0; i < 4; ++i) {
     result.data[i] = 0;
     for (int j = 0; j < 4; ++j) {
-      result.data[i] += data[j] * m.data[j][i];
+      result.data[i] += data[j] * m[j][i];
     }
   }
   return result;
@@ -68,7 +77,7 @@ Mat4 Mat4::operator+(const Mat4& other) const {
   Mat4 result;
   for (int i = 0; i < 4; ++i) {
     for (int j = 0; j < 4; ++j) {
-      result.data[i][j] = data[i][j] + other.data[i][j];
+      result.data[i][j] = data[i][j] + other[i][j];
     }
   }
   return result;
@@ -78,7 +87,7 @@ Mat4 Mat4::operator-(const Mat4& other) const {
   Mat4 result;
   for (int i = 0; i < 4; ++i) {
     for (int j = 0; j < 4; ++j) {
-      result.data[i][j] = data[i][j] - other.data[i][j];
+      result.data[i][j] = data[i][j] - other[i][j];
     }
   }
   return result;
@@ -90,7 +99,7 @@ Mat4 Mat4::operator*(const Mat4& other) const {
     for (int j = 0; j < 4; ++j) {
       result.data[i][j] = 0;
       for (int k = 0; k < 4; ++k) {
-        result.data[i][j] += data[i][k] * other.data[k][j];
+        result.data[i][j] += data[i][k] * other[k][j];
       }
     }
   }
@@ -119,23 +128,20 @@ Mat4 Mat4::lookAt(const Vec3& eye, const Vec3& center, const Vec3& up) {
   Vec3 u = f.cross(r).normalize();
 
   Mat4 result;
-  result.data[0][0] = r.data[0];
-  result.data[0][1] = r.data[1];
-  result.data[0][2] = r.data[2];
-  result.data[0][3] = -r.data[0] * eye.data[0] - r.data[1] * eye.data[1] -
-                      r.data[2] * eye.data[2];
+  result.data[0][0] = r[0];
+  result.data[0][1] = r[1];
+  result.data[0][2] = r[2];
+  result.data[0][3] = -r[0] * eye[0] - r[1] * eye[1] - r[2] * eye[2];
 
-  result.data[1][0] = u.data[0];
-  result.data[1][1] = u.data[1];
-  result.data[1][2] = u.data[2];
-  result.data[1][3] = -u.data[0] * eye.data[0] - u.data[1] * eye.data[1] -
-                      u.data[2] * eye.data[2];
+  result.data[1][0] = u[0];
+  result.data[1][1] = u[1];
+  result.data[1][2] = u[2];
+  result.data[1][3] = -u[0] * eye[0] - u[1] * eye[1] - u[2] * eye[2];
 
-  result.data[2][0] = f.data[0];
-  result.data[2][1] = f.data[1];
-  result.data[2][2] = f.data[2];
-  result.data[2][3] = -f.data[0] * eye.data[0] - f.data[1] * eye.data[1] -
-                      f.data[2] * eye.data[2];
+  result.data[2][0] = f[0];
+  result.data[2][1] = f[1];
+  result.data[2][2] = f[2];
+  result.data[2][3] = -f[0] * eye[0] - f[1] * eye[1] - f[2] * eye[2];
 
   result.data[3][0] = 0.0f;
   result.data[3][1] = 0.0f;
