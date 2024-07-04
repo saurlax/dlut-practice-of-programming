@@ -1,28 +1,14 @@
 #pragma once
-#include <graphics.h>
 
 #include <map>
 
-#include "Math.h"
-
-#define TYPE_MAX 256
-
-class Texture {
-  static int count;
-  IMAGE image;
-
- public:
-  static Texture byId[TYPE_MAX];
-  static int Create(LPCTSTR path);
-
-  DWORD operator()(int x, int y);
-};
+#include "Shader.h"
 
 class Block {
   static int count;
 
  public:
-  static Block byId[TYPE_MAX];
+  static Block byId[];
   Texture* textures[6];
   static int Create(Texture* top, Texture* bottom, Texture* front,
                     Texture* back, Texture* left, Texture* right);
