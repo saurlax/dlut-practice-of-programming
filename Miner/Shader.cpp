@@ -41,10 +41,10 @@ void Shader::Draw(Camera& camera) {
   Mat4 view = camera.GetViewMatrix();
   Mat4 projection = camera.GetProjectionMatrix();
   for (int i = 0; i < count; i++) {
-    Vec3 a = view * projection * Buffer[i].vertices[0];
-    Vec3 b = view * projection * Buffer[i].vertices[1];
-    Vec3 c = view * projection * Buffer[i].vertices[2];
-    Vec3 d = view * projection * Buffer[i].vertices[3];
+    Vec3 a = projection * view * Buffer[i].vertices[0];
+    Vec3 b = projection * view * Buffer[i].vertices[1];
+    Vec3 c = projection * view * Buffer[i].vertices[2];
+    Vec3 d = projection * view * Buffer[i].vertices[3];
     Texture& texture = Texture::byId[Buffer[i].textureId];
     for (int x = 0; x < 16; x++) {
       for (int y = 0; y < 16; y++) {
@@ -61,6 +61,10 @@ void Shader::Draw(Camera& camera) {
         points[1] = {(long)(width * p2[0]), (long)(height * p2[1])};
         points[2] = {(long)(width * p3[0]), (long)(height * p3[1])};
         points[3] = {(long)(width * p4[0]), (long)(height * p4[1])};
+        points[0].y = height - points[0].y;
+        points[1].y = height - points[1].y;
+        points[2].y = height - points[2].y;
+        points[3].y = height - points[3].y;
         setfillcolor(BGR(texture(x, y) & 0xffffff));
         solidpolygon(points, 4);
       }
