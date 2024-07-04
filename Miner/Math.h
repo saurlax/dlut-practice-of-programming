@@ -5,23 +5,25 @@ class Vec3 {
 
  public:
   Vec3(float x = 0, float y = 0, float z = 0);
-  float operator[](int index) const;
+  float& operator[](int index);
   Vec3 operator+(const Vec3& other) const;
   Vec3 operator-(const Vec3& other) const;
   Vec3 operator*(float scalar) const;
   Vec3 operator/(float scalar) const;
   Vec3 normalize() const;
   Vec3 cross(const Vec3& other) const;
+  friend class Mat4;
 };
 
 class Mat4 {
   float data[4][4];
 
  public:
-  const float* operator[](int index) const { return data[index]; }
+  float* operator[](int index) { return data[index]; }
   Mat4 operator+(const Mat4& other) const;
   Mat4 operator-(const Mat4& other) const;
   Mat4 operator*(const Mat4& other) const;
+  Vec3 operator*(const Vec3& other) const;
 
   static Mat4 perspective(float fov, float aspectRatio, float nearPlane,
                           float farPlane);
@@ -33,10 +35,9 @@ class Vec4 {
 
  public:
   Vec4(float x = 0, float y = 0, float z = 0, float w = 0);
-  float operator[](int index) const;
+  float& operator[](int index);
   Vec4 operator+(const Vec4& other) const;
   Vec4 operator-(const Vec4& other) const;
-  Vec4 operator*(const Mat4& m) const;
 
   Vec3 toVec3() const;
   Vec4 perspectiveDivide() const;

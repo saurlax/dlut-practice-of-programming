@@ -2,7 +2,9 @@
 
 #include <stdio.h>
 
+#include "Camera.h"
 #include "Math.h"
+
 Texture Texture::byId[256];
 int Texture::count = 0;
 
@@ -19,21 +21,31 @@ DWORD Texture::operator()(int x, int y) {
   return buffer[y * 16 + x];
 }
 
-void Shader::PushVAO(std::initializer_list<float> values) {
-  for (float value : values) {
-    VAO[count++] = value;
+Face::Face() {}
+
+Face::Face(std::initializer_list<Vec3> vertices) {
+  for (int i = 0; i < 4; i++) {
+    this->vertices[i] = *(vertices.begin() + i);
   }
 }
 
-void Shader::ClearVAO() { count = 0; }
+void Shader::PushBuffer(std::initializer_list<Face> values) {
+  for (Face value : values) {
+    Buffer[count++] = value;
+  }
+}
 
-void Shader::Draw() {
-  for (int offset = 0; offset < count; offset += 13) {
-    Vec3 a = {VAO[offset + 0], VAO[offset + 1], VAO[offset + 2]};
-    Vec3 b = {VAO[offset + 3], VAO[offset + 4], VAO[offset + 5]};
-    Vec3 c = {VAO[offset + 6], VAO[offset + 7], VAO[offset + 8]};
-    Vec3 d = {VAO[offset + 9], VAO[offset + 10], VAO[offset + 11]};
-    Texture& texture = Texture::byId[(int)VAO[offset + 12]];
+void Shader::ClearBuffer() { count = 0; }
+
+void Shader::Draw(Camera& camera) {
+  Mat4 view = camera.GetViewMatrix();
+  Mat4 projection = camera.GetProjectionMatrix();
+  for (int i = 0; i < count; i++) {
+    Vec3 a = view * projection * Buffer[i].vertices[0];
+    Vec3 b = view * projection * Buffer[i].vertices[1];
+    Vec3 c = view * projection * Buffer[i].vertices[2];
+    Vec3 d = view * projection * Buffer[i].vertices[3];
+    Texture& texture = Texture::byId[Buffer[i].textureId];
     for (int x = 0; x < 16; x++) {
       for (int y = 0; y < 16; y++) {
         float u1 = x / 16.0f;

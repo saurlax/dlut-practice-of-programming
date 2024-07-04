@@ -18,13 +18,13 @@ class Block {
 
 class Chunk {
  public:
-  Block blocks[16][16][256];
-  Chunk();
+  char blocks[16][16][256];
 };
 
 class World {
   std::map<std::pair<int, int>, Chunk> chunks;
 
  public:
-  World();
+  void SetBlock(int x, int y, int z, char id);
+  char GetBlock(int x, int y, int z);
 };

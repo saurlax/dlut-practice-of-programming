@@ -20,3 +20,17 @@ int Block::Create(Texture* top, Texture* bottom, Texture* side) {
 }
 
 int Block::Create(Texture* all) { return Create(all, all, all); }
+
+void World::SetBlock(int x, int y, int z, char id) {
+  int cx = x / 16;
+  int cy = y / 16;
+  Chunk& chunk = chunks[std::make_pair(cx, cy)];
+  chunk.blocks[x % 16][y % 16][z % 256] = id;
+}
+
+char World::GetBlock(int x, int y, int z) {
+  int cx = x / 16;
+  int cy = y / 16;
+  Chunk& chunk = chunks[std::make_pair(cx, cy)];
+  return chunk.blocks[x % 16][y % 16][z % 256];
+}

@@ -12,20 +12,29 @@
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 #define FPS_MAX 60
+#define DEBUG_MAX 1000
 
 HWND hwnd;
 DWORD* surface;
 ExMessage msg;
 ULONGLONG tick;
+
+World world;
+Camera camera;
 Shader shader;
 
 bool running = true;
+bool debug = true;
+wchar_t debugText[DEBUG_MAX];
 
-Vec3 cameraPos = Vec3(0, 3, 0);
-Vec3 cameraDirection = Vec3(0, -1, 0);
+const Face FACE_UP = {{0, 1, 0}, {1, 1, 0}, {1, 1, 1}, {0, 1, 1}};
+const Face FACE_DOWN = {{0, 0, 1}, {1, 0, 1}, {1, 0, 0}, {0, 0, 0}};
+const Face FACE_FRONT = {{0, 0, 1}, {1, 0, 1}, {1, 1, 1}, {0, 1, 1}};
+const Face FACE_BACK = {{0, 0, 0}, {0, 1, 0}, {1, 1, 0}, {1, 0, 0}};
+const Face FACE_LEFT = {{0, 0, 0}, {0, 0, 1}, {0, 1, 1}, {0, 1, 0}};
+const Face FACE_RIGHT = {{1, 0, 0}, {1, 1, 0}, {1, 1, 1}, {1, 0, 1}};
 
 void init() {
-  printf("[init] starting\n");
   srand(time(NULL));
   tick = GetTickCount();
 
@@ -43,10 +52,12 @@ void init() {
   shader.width = WINDOW_WIDTH;
   shader.height = WINDOW_HEIGHT;
   shader.surface = surface;
+  camera.aspectRatio = WINDOW_WIDTH / WINDOW_HEIGHT;
 
-  printf("[init] done\n");
+  // test world
+  shader.PushBuffer(
+      {FACE_UP, FACE_DOWN, FACE_FRONT, FACE_BACK, FACE_LEFT, FACE_RIGHT});
 }
-
 void input() {
   if (!IsWindow(hwnd)) running = false;
   while (peekmessage(&msg)) {
@@ -56,20 +67,35 @@ void input() {
         case VK_ESCAPE:
           running = false;
           break;
+        case 'W':
+        case VK_UP:
+          camera.position[2]++;
+          break;
+        case 'S':
+        case VK_DOWN:
+          camera.position[2]--;
+          break;
+        case 'A':
+        case VK_LEFT:
+          camera.position[0]--;
+          break;
+        case 'D':
+        case VK_RIGHT:
+          camera.position[0]++;
+          break;
       }
     }
   }
 }
 
-void update(int last) {}
+void update(int delta) {}
 
-void render(int last) {
-  shader.PushVAO({0.25, 0, 0, 0.75, 0, 0, 1, 1, 0, 0, 1, 0, 0});
+void render(int delta) {
   BeginBatchDraw();
-  shader.Draw();
-  wchar_t text[100];
-  swprintf(text, 100, L"FPS: %d", 1000 / last);
-  outtextxy(0, 0, text);
+  shader.Draw(camera);
+  swprintf(debugText, DEBUG_MAX, L"FPS(%d)    POS(%f,%f,%f)", 1000 / delta,
+           camera.position[0], camera.position[1], camera.position[2]);
+  outtextxy(0, 0, debugText);
   FlushBatchDraw();
 }
 
@@ -77,12 +103,12 @@ int main() {
   init();
   while (running) {
     ULONGLONG now = GetTickCount();
-    int last = now - tick;
+    int delta = now - tick;
     input();
-    if (last * FPS_MAX < 1000) continue;
+    if (delta * FPS_MAX < 1000) continue;
     tick = now;
-    update(last);
-    render(last);
+    update(delta);
+    render(delta);
   }
   closegraph();
   return 0;
