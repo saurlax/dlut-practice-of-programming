@@ -59,8 +59,6 @@ Vec4 Vec4::operator-(const Vec4& other) const {
               data[2] - other.data[2], data[3] - other.data[3]);
 }
 
-Vec3 Vec4::toVec3() const { return Vec3(data[0], data[1], data[2]); }
-
 Vec4 Vec4::perspectiveDivide() const {
   return Vec4(data[0] / data[3], data[1] / data[3], data[2] / data[3], 1.0f);
 }

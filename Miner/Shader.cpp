@@ -57,10 +57,10 @@ void Shader::Draw(Camera& camera) {
         Vec3 p3 = a + (b - a) * u2 + (d - a) * v2 + (a - b + c - d) * u2 * v2;
         Vec3 p4 = a + (b - a) * u1 + (d - a) * v2 + (a - b + c - d) * u1 * v2;
         POINT points[4];
-        points[0] = {(int)(width * p1[0]), (int)(height * p1[1])};
-        points[1] = {(int)(width * p2[0]), (int)(height * p2[1])};
-        points[2] = {(int)(width * p3[0]), (int)(height * p3[1])};
-        points[3] = {(int)(width * p4[0]), (int)(height * p4[1])};
+        points[0] = {(long)(width * p1[0]), (long)(height * p1[1])};
+        points[1] = {(long)(width * p2[0]), (long)(height * p2[1])};
+        points[2] = {(long)(width * p3[0]), (long)(height * p3[1])};
+        points[3] = {(long)(width * p4[0]), (long)(height * p4[1])};
         setfillcolor(BGR(texture(x, y) & 0xffffff));
         solidpolygon(points, 4);
       }

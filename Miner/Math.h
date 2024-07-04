@@ -16,7 +16,7 @@ class Vec3 {
 };
 
 class Mat4 {
-  float data[4][4];
+  float data[4][4] = {};
 
  public:
   float* operator[](int index) { return data[index]; }
@@ -38,7 +38,5 @@ class Vec4 {
   float& operator[](int index);
   Vec4 operator+(const Vec4& other) const;
   Vec4 operator-(const Vec4& other) const;
-
-  Vec3 toVec3() const;
   Vec4 perspectiveDivide() const;
 };

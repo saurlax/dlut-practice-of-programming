@@ -8,7 +8,7 @@ class Camera {
   float viewDistance = 1000.0f;
   float yaw;
   float pitch;
-  float fov = 45.0f;
+  float fov = 40.0f;
 
   Mat4 GetViewMatrix() const;
   Mat4 GetProjectionMatrix() const;

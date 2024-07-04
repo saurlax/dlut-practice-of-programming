@@ -15,6 +15,7 @@
 #define DEBUG_MAX 1000
 
 HWND hwnd;
+RECT rect;
 DWORD* surface;
 ExMessage msg;
 ULONGLONG tick;
@@ -26,13 +27,14 @@ Shader shader;
 bool running = true;
 bool debug = true;
 wchar_t debugText[DEBUG_MAX];
+int lastMouseX, lastMouseY;
 
-const Face FACE_UP = {{0, 1, 0}, {1, 1, 0}, {1, 1, 1}, {0, 1, 1}};
-const Face FACE_DOWN = {{0, 0, 1}, {1, 0, 1}, {1, 0, 0}, {0, 0, 0}};
-const Face FACE_FRONT = {{0, 0, 1}, {1, 0, 1}, {1, 1, 1}, {0, 1, 1}};
-const Face FACE_BACK = {{0, 0, 0}, {0, 1, 0}, {1, 1, 0}, {1, 0, 0}};
-const Face FACE_LEFT = {{0, 0, 0}, {0, 0, 1}, {0, 1, 1}, {0, 1, 0}};
-const Face FACE_RIGHT = {{1, 0, 0}, {1, 1, 0}, {1, 1, 1}, {1, 0, 1}};
+const Face FACE_UP = {{0, 1, 0}, {1, 1, 0}, {1, 1, 1}, {0, 1, 1}, 1};
+const Face FACE_DOWN = {{0, 0, 1}, {1, 0, 1}, {1, 0, 0}, {0, 0, 0}, 1};
+const Face FACE_FRONT = {{0, 0, 1}, {1, 0, 1}, {1, 1, 1}, {0, 1, 1}, 1};
+const Face FACE_BACK = {{0, 0, 0}, {0, 1, 0}, {1, 1, 0}, {1, 0, 0}, 1};
+const Face FACE_LEFT = {{0, 0, 0}, {0, 0, 1}, {0, 1, 1}, {0, 1, 0}, 1};
+const Face FACE_RIGHT = {{1, 0, 0}, {1, 1, 0}, {1, 1, 1}, {1, 0, 1}, 1};
 
 void init() {
   srand(time(NULL));
@@ -54,6 +56,11 @@ void init() {
   shader.surface = surface;
   camera.aspectRatio = WINDOW_WIDTH / WINDOW_HEIGHT;
 
+  setcapture();
+  GetWindowRect(hwnd, &rect);
+  ShowCursor(-1);
+  ClipCursor(&rect);
+
   // test world
   shader.PushBuffer(
       {FACE_UP, FACE_DOWN, FACE_FRONT, FACE_BACK, FACE_LEFT, FACE_RIGHT});
@@ -66,6 +73,12 @@ void input() {
       switch (msg.vkcode) {
         case VK_ESCAPE:
           running = false;
+          break;
+        case VK_SPACE:
+          camera.position[1]++;
+          break;
+        case VK_SHIFT:
+          camera.position[1]--;
           break;
         case 'W':
         case VK_UP:
@@ -84,6 +97,13 @@ void input() {
           camera.position[0]++;
           break;
       }
+    } else if (msg.message == WM_MOUSEMOVE) {
+      int deltaX = msg.x - lastMouseX;
+      int deltaY = msg.y - lastMouseY;
+      lastMouseX = msg.x;
+      lastMouseY = msg.y;
+      camera.yaw += deltaX;
+      camera.pitch += deltaY;
     }
   }
 }
@@ -92,9 +112,11 @@ void update(int delta) {}
 
 void render(int delta) {
   BeginBatchDraw();
+  cleardevice();
   shader.Draw(camera);
-  swprintf(debugText, DEBUG_MAX, L"FPS(%d)    POS(%f,%f,%f)", 1000 / delta,
-           camera.position[0], camera.position[1], camera.position[2]);
+  swprintf(debugText, DEBUG_MAX, L"FPS(%d)    POS(%f,%f,%f)    DIRCTION(%f,%f)",
+           1000 / delta, camera.position[0], camera.position[1],
+           camera.position[2], camera.yaw, camera.pitch);
   outtextxy(0, 0, debugText);
   FlushBatchDraw();
 }
