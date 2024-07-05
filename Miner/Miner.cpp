@@ -61,6 +61,9 @@ void init() {
   // ClipCursor(&rect);
 
   // test world
+  Face ground = {{-10, 0, -10}, {10, 0, -10}, {10, 0, 10}, {-10, 0, 10}};
+  ground.textureId = 1;
+  shader.PushBuffer({ground});
   shader.PushBuffer(
       {FACE_UP, FACE_DOWN, FACE_FRONT, FACE_BACK, FACE_LEFT, FACE_RIGHT});
 }
@@ -96,10 +99,10 @@ void input() {
           camera.position[0]++;
           break;
         case 'Q':
-          camera.yaw--;
+          camera.yaw -= 0.17;
           break;
         case 'E':
-          camera.yaw++;
+          camera.yaw += 0.17;
           break;
       }
     } else if (msg.message == WM_MOUSEMOVE) {
