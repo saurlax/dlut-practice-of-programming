@@ -12,7 +12,10 @@
 #define WINDOW_HEIGHT 600
 #define BG_COLOR 0xc9f1ff
 
+#define G 9.8
+#define PI 3.1415926
 #define MOVE_SPEED 5
+#define JUMP_ACCEL 10
 
 using namespace std;
 
@@ -41,7 +44,8 @@ void init() {
   }
 
   moveLeft = moveRight = false;
-  playerX = playerY = playerdX = playerdY = 0;
+  playerX = playerdX = playerdY = 0;
+  playerY = 10;
 }
 
 void input() {
@@ -79,9 +83,26 @@ void input() {
 
 void update(int delta) {
   playerdX = (moveRight - moveLeft) * MOVE_SPEED;
-  if (jump) {
-    playerdY = 10;
+  if (jump) playerdY += 10;
+  playerdY -= G * delta / 1000;
+
+  float playerLeft = playerX;
+  float playerRight = playerX + 16;
+  float playerTop = playerY;
+  float playerBottom = playerY + 16;
+
+  for (int y = floor(playerTop); y < ceil(playerBottom); y++) {
+    if (world(floor(playerLeft), y) || world(ceil(playerRight), y)) {
+      playerdX = 0;
+    }
   }
+
+  for (int x = floor(playerLeft); x < ceil(playerRight); x++) {
+    if (world(x, floor(playerTop)) || world(x, ceil(playerBottom))) {
+      playerdY = 0;
+    }
+  }
+
   playerX += playerdX * delta / 1000;
   playerY += playerdY * delta / 1000;
 }
@@ -108,6 +129,9 @@ void render(int delta) {
       }
     }
   }
+  setfillcolor(RED);
+  solidrectangle(offsetX + playerX * 16, offsetY - playerY * 16,
+                 offsetX + playerX * 16 + 16, offsetY - playerY * 16 + 16);
   if (debug) {
     debugText = L"FPS: " + to_wstring(1000 / delta) + L"  POS: " +
                 to_wstring(playerX) + L", " + to_wstring(playerY);
