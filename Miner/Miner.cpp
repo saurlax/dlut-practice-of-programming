@@ -51,11 +51,10 @@ void init() {
   Block::Create(&Texture::byId[1], &Texture::byId[0], &Texture::byId[2]);
   Block::Create(&Texture::byId[0]);
   surface = GetImageBuffer();
-  shader.width = WINDOW_WIDTH;
-  shader.height = WINDOW_HEIGHT;
   shader.surface = surface;
+  shader.SetSize(WINDOW_WIDTH, WINDOW_HEIGHT);
   camera.aspectRatio = WINDOW_WIDTH / WINDOW_HEIGHT;
-  camera.position = {3, 0, 0};
+  camera.position = {0, 0, 3};
   // setcapture();
   // GetWindowRect(hwnd, &rect);
   // ShowCursor(-1);
@@ -82,11 +81,11 @@ void input() {
           break;
         case 'W':
         case VK_UP:
-          camera.position[2]++;
+          camera.position[2]--;
           break;
         case 'S':
         case VK_DOWN:
-          camera.position[2]--;
+          camera.position[2]++;
           break;
         case 'A':
         case VK_LEFT:

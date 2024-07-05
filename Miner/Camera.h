@@ -5,7 +5,7 @@ class Camera {
  public:
   Vec3 position;
   float aspectRatio;
-  float viewDistance = 1000.0f;
+  float viewDistance = 100.0f;
   float yaw;
   float pitch;
   float fov = 40.0f;

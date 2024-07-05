@@ -30,13 +30,15 @@ class Face {
 };
 
 class Shader {
-  Face Buffer[BUFFER_SIZE];
+  Face FAO[BUFFER_SIZE];
+  float* zBuffer;
   int count;
+  int width;
+  int height;
 
  public:
   DWORD* surface;
-  int width;
-  int height;
+  void SetSize(int width, int height);
   void PushBuffer(std::initializer_list<Face> values);
   void ClearBuffer();
   void Draw(Camera& camera);

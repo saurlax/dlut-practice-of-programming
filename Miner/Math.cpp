@@ -47,6 +47,13 @@ Vec4::Vec4(float x, float y, float z, float w) {
   data[3] = w;
 }
 
+Vec4::Vec4(const Vec3& other, float w) {
+  data[0] = other.data[0];
+  data[1] = other.data[1];
+  data[2] = other.data[2];
+  data[3] = w;
+}
+
 float& Vec4::operator[](int index) { return data[index]; }
 
 Vec4 Vec4::operator+(const Vec4& other) const {
@@ -59,8 +66,8 @@ Vec4 Vec4::operator-(const Vec4& other) const {
               data[2] - other.data[2], data[3] - other.data[3]);
 }
 
-Vec4 Vec4::perspectiveDivide() const {
-  return Vec4(data[0] / data[3], data[1] / data[3], data[2] / data[3], 1.0f);
+Vec3 Vec4::perspectiveDivide() const {
+  return Vec3(data[0] / data[3], data[1] / data[3], data[2] / data[3]);
 }
 
 Mat4 Mat4::operator+(const Mat4& other) const {
@@ -96,13 +103,15 @@ Mat4 Mat4::operator*(const Mat4& other) const {
   return result;
 }
 
-Vec3 Mat4::operator*(const Vec3& other) const {
-  return Vec3(data[0][0] * other.data[0] + data[0][1] * other.data[1] +
-                  data[0][2] * other.data[2] + data[0][3],
-              data[1][0] * other.data[0] + data[1][1] * other.data[1] +
-                  data[1][2] * other.data[2] + data[1][3],
-              data[2][0] * other.data[0] + data[2][1] * other.data[1] +
-                  data[2][2] * other.data[2] + data[2][3]);
+Vec4 Mat4::operator*(const Vec4& other) const {
+  Vec4 result;
+  for (int i = 0; i < 4; ++i) {
+    result.data[i] = 0;
+    for (int j = 0; j < 4; ++j) {
+      result.data[i] += data[i][j] * other.data[j];
+    }
+  }
+  return result;
 }
 
 Mat4 Mat4::perspective(float fov, float aspectRatio, float nearPlane,
