@@ -12,6 +12,8 @@
 #define WINDOW_HEIGHT 600
 #define BG_COLOR 0xc9f1ff
 
+#define MOVE_SPEED 5
+
 using namespace std;
 
 HWND hwnd;
@@ -23,10 +25,9 @@ bool running = true;
 bool debug = true;
 wstring debugText;
 
-float playerX = 0;
-float playerY = 0;
-float cameraX = 0;
-float cameraY = 0;
+int mouseX, mouseY;
+bool moveLeft, moveRight, jump;
+float playerX, playerY, playerdX, playerdY;
 
 IMAGE textures[ID_MAX];
 
@@ -38,34 +39,51 @@ void init() {
         L"assets/" + wstring(p.first.begin(), p.first.end()) + L".png";
     loadimage(&textures[p.second], path.c_str());
   }
+
+  moveLeft = moveRight = false;
+  playerX = playerY = playerdX = playerdY = 0;
 }
 
 void input() {
   while (peekmessage(&msg)) {
-    if (msg.message == WM_KEYDOWN) {
+    if (msg.message == WM_KEYDOWN || msg.message == WM_KEYUP) {
+      bool keydown = msg.message == WM_KEYDOWN;
       switch (msg.vkcode) {
         case VK_ESCAPE:
           running = false;
           break;
         case VK_TAB:
-          debug = !debug;
+          if (keydown) debug = !debug;
           break;
         case 'A':
         case VK_LEFT:
-          playerX -= 1;
+          moveLeft = keydown;
           break;
         case 'D':
         case VK_RIGHT:
-          playerX += 1;
+          moveRight = keydown;
+          break;
+        case 'W':
+        case VK_UP:
+        case VK_SPACE:
+          jump = keydown;
           break;
       }
+    }
+    if (msg.message == WM_MOUSEMOVE) {
+      mouseX = msg.x;
+      mouseY = msg.y;
     }
   }
 }
 
 void update(int delta) {
-  cameraX = playerX;
-  cameraY = playerY;
+  playerdX = (moveRight - moveLeft) * MOVE_SPEED;
+  if (jump) {
+    playerdY = 10;
+  }
+  playerX += playerdX * delta / 1000;
+  playerY += playerdY * delta / 1000;
 }
 
 void render(int delta) {
@@ -74,18 +92,24 @@ void render(int delta) {
     setlinecolor(HSVtoRGB(195, 0.23f - 0.23f * y / WINDOW_HEIGHT, 1));
     line(0, y, WINDOW_WIDTH, y);
   }
-  for (int x = playerX - WINDOW_WIDTH / 16; x < playerX + WINDOW_WIDTH / 16;
-       x++) {
-    for (int y = max(0, (int)playerY - WINDOW_HEIGHT / 16);
-         y < min(128, (int)playerY + WINDOW_HEIGHT / 16); y++) {
+  int boundLeft = playerX - WINDOW_WIDTH / 16;
+  int boundRight = playerX + WINDOW_WIDTH / 16;
+  int boundTop = max(0, (int)playerY - WINDOW_HEIGHT / 16);
+  int boundBottom = min(128, (int)playerY + WINDOW_HEIGHT / 16);
+  int cameraX = (mouseX - WINDOW_WIDTH / 2) / 4;
+  int cameraY = (mouseY - WINDOW_HEIGHT / 2) / 4;
+  int offsetX = WINDOW_WIDTH / 2 - playerX * 16 - cameraX;
+  int offsetY = WINDOW_HEIGHT / 2 + playerY * 16 - cameraY;
+
+  for (int x = boundLeft; x < boundRight; x++) {
+    for (int y = boundTop; y < boundBottom; y++) {
       if (char id = world(x, y)) {
-        putimage(WINDOW_WIDTH / 2 + x * 16 - cameraX * 16,
-                 WINDOW_HEIGHT / 2 - y * 16 - cameraY * 16, &textures[id]);
+        putimage(offsetX + x * 16, offsetY - y * 16, &textures[id]);
       }
     }
   }
   if (debug) {
-    debugText = L"FPS: " + to_wstring(1000 / delta) + L"POS: " +
+    debugText = L"FPS: " + to_wstring(1000 / delta) + L"  POS: " +
                 to_wstring(playerX) + L", " + to_wstring(playerY);
     outtextxy(0, 0, debugText.c_str());
   }
