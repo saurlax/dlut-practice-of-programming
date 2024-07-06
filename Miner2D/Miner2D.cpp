@@ -32,6 +32,7 @@ bool debug = true;
 wstring debugText;
 
 int mouseX, mouseY;
+bool mouseL, mouseR;
 float cameraX, cameraY;
 int selectX, selectY;
 bool moveLeft, moveRight, jump, onair;
@@ -79,10 +80,17 @@ void input() {
           jump = keydown;
           break;
       }
-    }
-    if (msg.message == WM_MOUSEMOVE) {
+    } else if (msg.message == WM_MOUSEMOVE) {
       mouseX = msg.x;
       mouseY = msg.y;
+    } else if (msg.message == WM_LBUTTONDOWN) {
+      mouseL = true;
+    } else if (msg.message == WM_LBUTTONUP) {
+      mouseL = false;
+    } else if (msg.message == WM_RBUTTONDOWN) {
+      mouseR = true;
+    } else if (msg.message == WM_RBUTTONUP) {
+      mouseR = false;
     }
   }
 }
@@ -93,7 +101,6 @@ void update(int delta) {
   cameraY = (mouseY - WINDOW_HEIGHT / 2.0f) / 4;
   selectX = playerX + floor(cameraX * 5 / 16);
   selectY = playerY + floor(cameraY * 5 / 16);
-  printf("%d %d\n", selectX, selectY);
 
   playerdX = (moveRight - moveLeft) * MOVE_SPEED;
   playerdY += G * delta / 1000;
@@ -140,6 +147,12 @@ void update(int delta) {
     onair = false;
   } else {
     playerY += deltaY;
+  }
+
+  if (mouseL) {
+    if (selectY >= 0 && selectY < 128) {
+      world(selectX, selectY) = 0;
+    }
   }
 }
 
