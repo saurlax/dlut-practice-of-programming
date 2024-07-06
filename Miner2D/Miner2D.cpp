@@ -32,6 +32,8 @@ bool debug = true;
 wstring debugText;
 
 int mouseX, mouseY;
+float cameraX, cameraY;
+int selectX, selectY;
 bool moveLeft, moveRight, jump, onair;
 float playerX, playerY, playerdX, playerdY;
 
@@ -86,6 +88,13 @@ void input() {
 }
 
 void update(int delta) {
+  if (!IsWindow(hwnd)) running = false;
+  cameraX = (mouseX - WINDOW_WIDTH / 2.0f) / 4;
+  cameraY = (mouseY - WINDOW_HEIGHT / 2.0f) / 4;
+  selectX = playerX + floor(cameraX * 5 / 16);
+  selectY = playerY + floor(cameraY * 5 / 16);
+  printf("%d %d\n", selectX, selectY);
+
   playerdX = (moveRight - moveLeft) * MOVE_SPEED;
   playerdY += G * delta / 1000;
   if (jump && !onair) playerdY = -JUMP_ACCEL;
@@ -144,8 +153,6 @@ void render(int delta) {
   int boundRight = playerX + WINDOW_WIDTH / 16;
   int boundTop = max(0, (int)playerY - WINDOW_HEIGHT / 16);
   int boundBottom = min(128, (int)playerY + WINDOW_HEIGHT / 16);
-  int cameraX = (mouseX - WINDOW_WIDTH / 2) / 4;
-  int cameraY = (mouseY - WINDOW_HEIGHT / 2) / 4;
   int offsetX = WINDOW_WIDTH / 2 - playerX * 16 - cameraX;
   int offsetY = WINDOW_HEIGHT / 2 - playerY * 16 - cameraY;
 
@@ -160,6 +167,11 @@ void render(int delta) {
   solidrectangle(offsetX + playerX * 16, offsetY + playerY * 16,
                  offsetX + playerX * 16 + PLAYER_WIDTH,
                  offsetY + playerY * 16 + PLAYER_HEIGHT);
+  if (world.safeRead(selectX, selectY)) {
+    setlinecolor(BLACK);
+    rectangle(offsetX + selectX * 16, offsetY + selectY * 16,
+              offsetX + selectX * 16 + 16, offsetY + selectY * 16 + 16);
+  }
   if (debug) {
     debugText = L"FPS: " + to_wstring(1000 / delta) + L"  POS: " +
                 to_wstring(playerX) + L", " + to_wstring(playerY);
