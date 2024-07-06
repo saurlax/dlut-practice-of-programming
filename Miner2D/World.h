@@ -14,8 +14,11 @@ class Chunk {
 
 class World {
   map<int, Chunk> chunks;
+  map<int, int> noise;
+  int seed;
 
  public:
+  World();
   char& operator()(int x, int y);
   char safeRead(int x, int y);
 };

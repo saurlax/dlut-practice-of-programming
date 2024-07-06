@@ -12,11 +12,11 @@
 #define WINDOW_HEIGHT 600
 #define BG_COLOR 0xc9f1ff
 
-#define EPS 1e-6
+#define EPS 1e-3
 #define G 9.8
 #define PI 3.1415926
-#define MOVE_SPEED 5
-#define JUMP_ACCEL 5
+#define MOVE_SPEED 10
+#define JUMP_ACCEL 10
 #define PLAYER_WIDTH 12
 #define PLAYER_HEIGHT 12
 
@@ -49,8 +49,7 @@ void init() {
   onair = true;
   moveLeft = moveRight = false;
   playerX = playerdX = playerdY = 0;
-  playerX = 1.2;
-  playerY = -10;
+  playerY = 20;
 }
 
 void input() {
@@ -92,14 +91,10 @@ void update(int delta) {
   if (jump && !onair) playerdY = -JUMP_ACCEL;
   onair = true;
 
-  printf("\033[H");
   float playerLeft = playerX;
   float playerRight = playerX + PLAYER_WIDTH / 16.0f;
   float playerTop = playerY;
   float playerBottom = playerY + PLAYER_HEIGHT / 16.0f;
-
-  printf("playerLeft: %f, playerRight: %f, playerTop: %f, playerBottom: %f\n",
-         playerLeft, playerRight, playerTop, playerBottom);
 
   float deltaX = playerdX * delta / 1000;
   float deltaY = playerdY * delta / 1000;
@@ -113,23 +108,16 @@ void update(int delta) {
   bool blockBottom = world.safeRead(floor(playerLeft), ceil(playerBottom)) ||
                      world.safeRead(floor(playerRight), ceil(playerBottom));
 
-  printf("blockLeft: %d, blockRight: %d, blockTop: %d, blockBottom: %d\n",
-         blockLeft, blockRight, blockTop, blockBottom);
-
-  bool throughLeft = playerLeft + deltaX <= floor(playerLeft) + EPS;
-  bool throughRight = playerRight + deltaX >= ceil(playerRight) - EPS;
-  bool throughTop = playerTop + deltaY <= floor(playerTop) + EPS;
-  bool throughBottom = playerBottom + deltaY >= ceil(playerBottom) - EPS;
-
-  printf(
-      "throughLeft: %d, throughRight: %d, throughTop: %d, throughBottom: %d\n",
-      throughLeft, throughRight, throughTop, throughBottom);
+  bool throughLeft = playerLeft + deltaX <= floor(playerLeft);
+  bool throughRight = playerRight + deltaX >= ceil(playerRight);
+  bool throughTop = playerTop + deltaY <= floor(playerTop);
+  bool throughBottom = playerBottom + deltaY >= ceil(playerBottom);
 
   if (blockLeft && throughLeft) {
     playerX = floor(playerLeft);
     playerdX = 0;
   } else if (blockRight && throughRight) {
-    playerX = ceil(playerRight) - PLAYER_WIDTH / 16.0f;
+    playerX = ceil(playerRight) - PLAYER_WIDTH / 16.0f - EPS;
     playerdX = 0;
   } else {
     playerX += deltaX;
@@ -138,7 +126,7 @@ void update(int delta) {
     playerY = floor(playerTop);
     playerdY = 0;
   } else if (blockBottom && throughBottom) {
-    playerY = ceil(playerBottom) - PLAYER_HEIGHT / 16.0f;
+    playerY = ceil(playerBottom) - PLAYER_HEIGHT / 16.0f - EPS;
     playerdY = 0;
     onair = false;
   } else {
