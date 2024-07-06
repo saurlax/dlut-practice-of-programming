@@ -17,4 +17,5 @@ class World {
 
  public:
   char& operator()(int x, int y);
+  char safeRead(int x, int y);
 };

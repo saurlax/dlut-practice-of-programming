@@ -12,10 +12,13 @@
 #define WINDOW_HEIGHT 600
 #define BG_COLOR 0xc9f1ff
 
+#define EPS 1e-6
 #define G 9.8
 #define PI 3.1415926
 #define MOVE_SPEED 5
-#define JUMP_ACCEL 10
+#define JUMP_ACCEL 5
+#define PLAYER_WIDTH 12
+#define PLAYER_HEIGHT 12
 
 using namespace std;
 
@@ -29,7 +32,7 @@ bool debug = true;
 wstring debugText;
 
 int mouseX, mouseY;
-bool moveLeft, moveRight, jump;
+bool moveLeft, moveRight, jump, onair;
 float playerX, playerY, playerdX, playerdY;
 
 IMAGE textures[ID_MAX];
@@ -43,9 +46,11 @@ void init() {
     loadimage(&textures[p.second], path.c_str());
   }
 
+  onair = true;
   moveLeft = moveRight = false;
   playerX = playerdX = playerdY = 0;
-  playerY = 10;
+  playerX = 1.2;
+  playerY = -10;
 }
 
 void input() {
@@ -83,28 +88,62 @@ void input() {
 
 void update(int delta) {
   playerdX = (moveRight - moveLeft) * MOVE_SPEED;
-  if (jump) playerdY += 10;
-  playerdY -= G * delta / 1000;
+  playerdY += G * delta / 1000;
+  if (jump && !onair) playerdY = -JUMP_ACCEL;
+  onair = true;
 
+  printf("\033[H");
   float playerLeft = playerX;
-  float playerRight = playerX + 16;
+  float playerRight = playerX + PLAYER_WIDTH / 16.0f;
   float playerTop = playerY;
-  float playerBottom = playerY + 16;
+  float playerBottom = playerY + PLAYER_HEIGHT / 16.0f;
 
-  for (int y = floor(playerTop); y < ceil(playerBottom); y++) {
-    if (world(floor(playerLeft), y) || world(ceil(playerRight), y)) {
-      playerdX = 0;
-    }
+  printf("playerLeft: %f, playerRight: %f, playerTop: %f, playerBottom: %f\n",
+         playerLeft, playerRight, playerTop, playerBottom);
+
+  float deltaX = playerdX * delta / 1000;
+  float deltaY = playerdY * delta / 1000;
+
+  bool blockLeft = world.safeRead(floor(playerLeft - 1), floor(playerTop)) ||
+                   world.safeRead(floor(playerLeft - 1), floor(playerBottom));
+  bool blockRight = world.safeRead(ceil(playerRight), floor(playerTop)) ||
+                    world.safeRead(ceil(playerRight), floor(playerBottom));
+  bool blockTop = world.safeRead(floor(playerLeft), floor(playerTop - 1)) ||
+                  world.safeRead(floor(playerRight), floor(playerTop - 1));
+  bool blockBottom = world.safeRead(floor(playerLeft), ceil(playerBottom)) ||
+                     world.safeRead(floor(playerRight), ceil(playerBottom));
+
+  printf("blockLeft: %d, blockRight: %d, blockTop: %d, blockBottom: %d\n",
+         blockLeft, blockRight, blockTop, blockBottom);
+
+  bool throughLeft = playerLeft + deltaX <= floor(playerLeft) + EPS;
+  bool throughRight = playerRight + deltaX >= ceil(playerRight) - EPS;
+  bool throughTop = playerTop + deltaY <= floor(playerTop) + EPS;
+  bool throughBottom = playerBottom + deltaY >= ceil(playerBottom) - EPS;
+
+  printf(
+      "throughLeft: %d, throughRight: %d, throughTop: %d, throughBottom: %d\n",
+      throughLeft, throughRight, throughTop, throughBottom);
+
+  if (blockLeft && throughLeft) {
+    playerX = floor(playerLeft);
+    playerdX = 0;
+  } else if (blockRight && throughRight) {
+    playerX = ceil(playerRight) - PLAYER_WIDTH / 16.0f;
+    playerdX = 0;
+  } else {
+    playerX += deltaX;
   }
-
-  for (int x = floor(playerLeft); x < ceil(playerRight); x++) {
-    if (world(x, floor(playerTop)) || world(x, ceil(playerBottom))) {
-      playerdY = 0;
-    }
+  if (blockTop && throughTop) {
+    playerY = floor(playerTop);
+    playerdY = 0;
+  } else if (blockBottom && throughBottom) {
+    playerY = ceil(playerBottom) - PLAYER_HEIGHT / 16.0f;
+    playerdY = 0;
+    onair = false;
+  } else {
+    playerY += deltaY;
   }
-
-  playerX += playerdX * delta / 1000;
-  playerY += playerdY * delta / 1000;
 }
 
 void render(int delta) {
@@ -120,18 +159,19 @@ void render(int delta) {
   int cameraX = (mouseX - WINDOW_WIDTH / 2) / 4;
   int cameraY = (mouseY - WINDOW_HEIGHT / 2) / 4;
   int offsetX = WINDOW_WIDTH / 2 - playerX * 16 - cameraX;
-  int offsetY = WINDOW_HEIGHT / 2 + playerY * 16 - cameraY;
+  int offsetY = WINDOW_HEIGHT / 2 - playerY * 16 - cameraY;
 
   for (int x = boundLeft; x < boundRight; x++) {
     for (int y = boundTop; y < boundBottom; y++) {
-      if (char id = world(x, y)) {
-        putimage(offsetX + x * 16, offsetY - y * 16, &textures[id]);
+      if (char id = world.safeRead(x, y)) {
+        putimage(offsetX + x * 16, offsetY + y * 16, &textures[id]);
       }
     }
   }
   setfillcolor(RED);
-  solidrectangle(offsetX + playerX * 16, offsetY - playerY * 16,
-                 offsetX + playerX * 16 + 16, offsetY - playerY * 16 + 16);
+  solidrectangle(offsetX + playerX * 16, offsetY + playerY * 16,
+                 offsetX + playerX * 16 + PLAYER_WIDTH,
+                 offsetY + playerY * 16 + PLAYER_HEIGHT);
   if (debug) {
     debugText = L"FPS: " + to_wstring(1000 / delta) + L"  POS: " +
                 to_wstring(playerX) + L", " + to_wstring(playerY);
