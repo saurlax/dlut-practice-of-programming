@@ -3,7 +3,11 @@
 #include <cstdlib>
 #include <ctime>
 
-map<string, int> ID = {{"grass_block", 1}, {"dirt", 2}, {"stone", 3}};
+map<string, int> ID = {{"grass_block", 1},
+                       {"dirt", 2},
+                       {"stone", 3},
+                       {"oak_log", 4},
+                       {"oak_leaves", 5}};
 
 World::World() {
   srand(time(0));
@@ -34,6 +38,8 @@ char& World::operator()(int x, int y) {
                x1 * x2 * (x1 - x2) * y3) /
               denom;
 
+    int tree = rand() % 8 + 4;
+
     for (int cx = 0; cx < 16; cx++) {
       int h = a * (x + cx) * (x + cx) + b * (x + cx) + c;
       for (int cy = h; cy < 128; cy++) {
@@ -52,6 +58,21 @@ char& World::operator()(int x, int y) {
             chunk(cx, cy) = 3;
             break;
         }
+      }
+      if (cx == tree) {
+        for (int i = 1; i < 4; i++) {
+          chunk(cx, h - i) = 4;
+        }
+        for (int i = 0; i < 2; i++) {
+          for (int j = -2; j <= 2; j++) {
+            chunk(cx + j, h - 4 - i) = 5;
+          }
+        }
+        chunk(cx, h) = 2;
+        chunk(cx - 1, h - 6) = 5;
+        chunk(cx + 1, h - 6) = 5;
+        chunk(cx, h - 6) = 5;
+        chunk(cx, h - 7) = 5;
       }
     }
 
