@@ -6,6 +6,8 @@
 
 #include "World.h"
 
+#pragma comment(lib, "winmm.lib")
+
 #define FPS_MAX 100
 #define ID_MAX 128
 #define WINDOW_WIDTH 800
@@ -43,6 +45,10 @@ int backpack[12];
 
 IMAGE textures[ID_MAX];
 
+string soundBinding[] = {"",      "grass", "grass", "stone", "wood",
+                         "grass", "stone", "stone", "stone", "stone",
+                         "stone", "stone", "stone", "stone"};
+
 void init() {
   hwnd = initgraph(WINDOW_WIDTH, WINDOW_HEIGHT);
   surface = GetImageBuffer();
@@ -59,6 +65,11 @@ void init() {
   playerY = 40;
   backpack[ID["dirt"] - 1] = 5;
   choosed = ID["dirt"] - 1;
+  mciSendString(L"open assets/bgm.mp3 alias bgm", NULL, 0, NULL);
+  mciSendString(L"open assets/grass.mp3 alias grass", NULL, 0, NULL);
+  mciSendString(L"open assets/stone.mp3 alias stone", NULL, 0, NULL);
+  mciSendString(L"open assets/wood.mp3 alias wood", NULL, 0, NULL);
+  mciSendString(L"play bgm repeat", NULL, 0, NULL);
 }
 
 void input() {
@@ -171,6 +182,12 @@ void update(int delta) {
           block == ID["deepslate_diamond_ore"]) {
         score += block;
       }
+      mciSendString(
+          (L"play " +
+           wstring(soundBinding[block].begin(), soundBinding[block].end()) +
+           L" from 0")
+              .c_str(),
+          NULL, 0, NULL);
       world(selectX, selectY) = 0;
     }
   }
@@ -180,6 +197,12 @@ void update(int delta) {
       if (world(selectX, selectY) == 0 && backpack[choosed] > 0) {
         world(selectX, selectY) = choosed + 1;
         backpack[choosed]--;
+        mciSendString((L"play " +
+                       wstring(soundBinding[choosed + 1].begin(),
+                               soundBinding[choosed + 1].end()) +
+                       L" from 0")
+                          .c_str(),
+                      NULL, 0, NULL);
       }
     }
   }
