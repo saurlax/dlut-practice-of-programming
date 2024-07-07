@@ -19,7 +19,8 @@ int main()
 	initgraph(800, 600);
 	setorigin(400, 300);
 
-	while (running) {
+	while (running)
+	{
 		if (peekmessage(&msg))
 		{
 			if (msg.message == WM_CLOSE || msg.message == WM_KEYDOWN && msg.vkcode == VK_ESCAPE)
@@ -29,26 +30,25 @@ int main()
 		GetLocalTime(&time);
 
 		long long now = GetTickCount();
-		if (now - tick > 1000) {
+		if (now - tick > 1000)
+		{
 			tick = now;
 			updated = true;
 		}
 
-		if (updated) {
+		if (updated)
+		{
 			updated = false;
 			BeginBatchDraw();
 
-			// 清空背景
 			setcolor(BLACK);
 			setbkcolor(WHITE);
 			cleardevice();
 
-			// 绘制时钟外圈
 			setlinestyle(PS_SOLID, 3);
 			circle(0, 0, 250);
 			setlinestyle(PS_SOLID, 1);
 
-			// 绘制时钟内圈和填充
 			setfillcolor(0xe6e6e6);
 			fillcircle(0, 0, 242);
 
@@ -56,26 +56,26 @@ int main()
 
 			int r0 = 180, r1 = 222, r2 = 230;
 			int fontWidth = 30, fontHeight = 50;
-			settextstyle(fontHeight, fontWidth, L"宋体");
-			for (int i = 0; i < 60; i++) {
+			settextstyle(fontHeight, fontWidth, L"瀹嬩綋");
+			for (int i = 0; i < 60; i++)
+			{
 				double t = 2 * PI * i / 60 - PI / 3;
-				if (i % 5 == 0) {
-					// 绘制表盘
+				if (i % 5 == 0)
+				{
 					wchar_t text[3];
 					wsprintf(text, L"%d", i / 5 + 1);
 					double offsetX = fontWidth / 2.0, offsetY = fontHeight / 2.0;
-					if (lstrlen(text) > 1) {
+					if (lstrlen(text) > 1)
+					{
 						offsetX *= 2;
 					}
 					outtextxy(r0 * cos(t) - offsetX, r0 * sin(t) - offsetY, text);
 					setlinestyle(PS_SOLID, 2);
 				}
-				// 绘制刻度
 				line(r1 * cos(t), r1 * sin(t), r2 * cos(t), r2 * sin(t));
 				setlinestyle(PS_SOLID, 1);
 			}
 
-			// 绘制针芯
 			int rH = 140, rM = 210, rS = 180;
 			setfillcolor(BLACK);
 			solidcircle(0, 0, 10);
