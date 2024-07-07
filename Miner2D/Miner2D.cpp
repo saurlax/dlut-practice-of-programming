@@ -28,8 +28,8 @@ ExMessage msg;
 ULONGLONG last = GetTickCount();
 World world;
 bool running = true;
-bool debug = true;
-wstring debugText;
+bool stats = true;
+wstring statsText;
 
 int score, choosed;
 int mouseX, mouseY;
@@ -56,7 +56,7 @@ void init() {
   onair = true;
   moveLeft = moveRight = false;
   playerX = playerdX = playerdY = 0;
-  playerY = 20;
+  playerY = 40;
   backpack[ID["dirt"] - 1] = 5;
   choosed = ID["dirt"] - 1;
 }
@@ -70,7 +70,7 @@ void input() {
           running = false;
           break;
         case VK_TAB:
-          if (keydown) debug = !debug;
+          if (keydown) stats = !stats;
           break;
         case 'A':
         case VK_LEFT:
@@ -165,6 +165,13 @@ void update(int delta) {
   if (mouseL && selectY >= 0 && selectY < 128) {
     if (world(selectX, selectY) && world(selectX, selectY) != ID["bedrock"]) {
       backpack[world(selectX, selectY) - 1]++;
+      char block = world(selectX, selectY);
+      if (block == ID["coal_ore"] || block == ID["copper_ore"] ||
+          block == ID["iron_ore"] || block == ID["deepslate_gold_ore"] ||
+          block == ID["deepslate_emerald_ore"] ||
+          block == ID["deepslate_diamond_ore"]) {
+        score += block;
+      }
       world(selectX, selectY) = 0;
     }
   }
@@ -223,11 +230,12 @@ void render(int delta) {
   rectangle(inventoryX + choosed * 20, inventoryY,
             inventoryX + choosed * 20 + 19, inventoryY + 19);
 
-  if (debug) {
+  if (stats) {
     setbkmode(OPAQUE);
-    debugText = L"FPS: " + to_wstring(1000 / delta) + L"  POS: " +
-                to_wstring(playerX) + L", " + to_wstring(playerY);
-    outtextxy(0, 0, debugText.c_str());
+    statsText = L"SCORE: " + to_wstring(score) + L"  FPS: " +
+                to_wstring(1000 / delta) + L"  POS: " + to_wstring(playerX) +
+                L", " + to_wstring(playerY);
+    outtextxy(0, 0, statsText.c_str());
   }
   EndBatchDraw();
 }
