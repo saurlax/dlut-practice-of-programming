@@ -98,7 +98,6 @@ void input() {
     } else if (msg.message == WM_RBUTTONUP) {
       mouseR = false;
     } else if (msg.message == WM_MOUSEWHEEL) {
-      printf("%d\n", msg.wheel);
       if (msg.wheel < 0) {
         choosed = (choosed + 1) % 12;
       } else {
