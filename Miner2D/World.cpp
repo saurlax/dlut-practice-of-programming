@@ -10,14 +10,15 @@ map<string, int> ID = {
     {"stone", 3},
     {"oak_log", 4},
     {"oak_leaves", 5},
-    {"bedrock", 6},
-    {"coal_ore", 7},
-    {"copper_ore", 8},
-    {"iron_ore", 9},
-    {"deepslate", 10},
-    {"deepslate_gold_ore", 11},
-    {"deepslate_emerald_ore", 12},
-    {"deepslate_diamond_ore", 13},
+    {"coal_ore", 6},
+    {"copper_ore", 7},
+    {"iron_ore", 8},
+    {"deepslate", 9},
+    {"deepslate_gold_ore", 10},
+    {"deepslate_emerald_ore", 11},
+    {"deepslate_diamond_ore", 12},
+    {"bedrock", 13},
+    {"inventory", 14},
 };
 
 World::World() {

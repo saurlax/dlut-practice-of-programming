@@ -31,7 +31,7 @@ bool running = true;
 bool debug = true;
 wstring debugText;
 
-int score;
+int score, choosed;
 int mouseX, mouseY;
 bool mouseL, mouseR;
 float cameraX, cameraY;
@@ -39,7 +39,7 @@ int selectX, selectY;
 bool moveLeft, moveRight, jump, onair;
 float playerX, playerY, playerdX, playerdY;
 
-map<char, int> backpack[9];
+int backpack[12];
 
 IMAGE textures[ID_MAX];
 
@@ -57,6 +57,8 @@ void init() {
   moveLeft = moveRight = false;
   playerX = playerdX = playerdY = 0;
   playerY = 20;
+  backpack[ID["dirt"] - 1] = 5;
+  choosed = ID["dirt"] - 1;
 }
 
 void input() {
@@ -95,6 +97,13 @@ void input() {
       mouseR = true;
     } else if (msg.message == WM_RBUTTONUP) {
       mouseR = false;
+    } else if (msg.message == WM_MOUSEWHEEL) {
+      printf("%d\n", msg.wheel);
+      if (msg.wheel < 0) {
+        choosed = (choosed + 1) % 12;
+      } else {
+        choosed = (choosed - 1 + 12) % 12;
+      }
     }
   }
 }
@@ -154,17 +163,17 @@ void update(int delta) {
   }
 
   if (mouseL && selectY >= 0 && selectY < 128) {
-    if (world(selectX, selectY) != ID["bedrock"]) {
+    if (world(selectX, selectY) && world(selectX, selectY) != ID["bedrock"]) {
+      backpack[world(selectX, selectY) - 1]++;
       world(selectX, selectY) = 0;
     }
   }
   if (mouseR && selectY >= 0 && selectY < 128) {
-    printf("select: %d %d\n", selectX, selectY);
-    printf("player: %f %f\n", floor(playerLeft), floor(playerTop));
     if (!(selectX >= floor(playerLeft) && selectX <= floor(playerRight) &&
           selectY >= floor(playerTop) && selectY <= floor(playerBottom))) {
-      if (world(selectX, selectY) == 0) {
-        world(selectX, selectY) = ID["stone"];
+      if (world(selectX, selectY) == 0 && backpack[choosed] > 0) {
+        world(selectX, selectY) = choosed + 1;
+        backpack[choosed]--;
       }
     }
   }
@@ -194,12 +203,28 @@ void render(int delta) {
   solidrectangle(offsetX + playerX * 16, offsetY + playerY * 16,
                  offsetX + playerX * 16 + PLAYER_WIDTH,
                  offsetY + playerY * 16 + PLAYER_HEIGHT);
+  setlinecolor(BLACK);
   if (selectY >= 0 && selectY < 128) {
-    setlinecolor(BLACK);
     rectangle(offsetX + selectX * 16, offsetY + selectY * 16,
               offsetX + selectX * 16 + 16, offsetY + selectY * 16 + 16);
   }
+  int inventoryX = WINDOW_WIDTH - 12 * 20 - 1;
+  int inventoryY = 1;
+  for (int i = 0; i < 12; i++) {
+    putimage(inventoryX + i * 20, inventoryY, &textures[ID["inventory"]]);
+    putimage(inventoryX + i * 20 + 2, inventoryY + 2, &textures[i + 1]);
+    setbkmode(TRANSPARENT);
+    settextcolor(WHITE);
+    outtextxy(inventoryX + i * 20, inventoryY, to_wstring(backpack[i]).c_str());
+  }
+  rectangle(inventoryX - 1, inventoryY - 1, inventoryX + 12 * 20,
+            inventoryY + 20);
+  setlinecolor(RED);
+  rectangle(inventoryX + choosed * 20, inventoryY,
+            inventoryX + choosed * 20 + 19, inventoryY + 19);
+
   if (debug) {
+    setbkmode(OPAQUE);
     debugText = L"FPS: " + to_wstring(1000 / delta) + L"  POS: " +
                 to_wstring(playerX) + L", " + to_wstring(playerY);
     outtextxy(0, 0, debugText.c_str());
