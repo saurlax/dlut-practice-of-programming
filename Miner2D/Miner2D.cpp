@@ -235,6 +235,9 @@ void render(int delta) {
                 to_wstring(1000 / delta) + L"  POS: " + to_wstring(playerX) +
                 L", " + to_wstring(playerY);
     outtextxy(0, 0, statsText.c_str());
+    outtextxy(0, 16, L"A/D: Move  W/Space: Jump");
+    outtextxy(0, 32, L"LMOUSE: Dig  RMOUSE: Place");
+    outtextxy(0, 48, L"MOUSEWHEEL: Choose  TAB: Stats");
   }
   EndBatchDraw();
 }
