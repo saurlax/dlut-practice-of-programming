@@ -31,12 +31,15 @@ bool running = true;
 bool debug = true;
 wstring debugText;
 
+int score;
 int mouseX, mouseY;
 bool mouseL, mouseR;
 float cameraX, cameraY;
 int selectX, selectY;
 bool moveLeft, moveRight, jump, onair;
 float playerX, playerY, playerdX, playerdY;
+
+map<char, int> backpack[9];
 
 IMAGE textures[ID_MAX];
 
@@ -49,6 +52,7 @@ void init() {
     loadimage(&textures[p.second], path.c_str());
   }
 
+  score = 0;
   onair = true;
   moveLeft = moveRight = false;
   playerX = playerdX = playerdY = 0;
@@ -149,9 +153,19 @@ void update(int delta) {
     playerY += deltaY;
   }
 
-  if (mouseL) {
-    if (selectY >= 0 && selectY < 128) {
+  if (mouseL && selectY >= 0 && selectY < 128) {
+    if (world(selectX, selectY) != ID["bedrock"]) {
       world(selectX, selectY) = 0;
+    }
+  }
+  if (mouseR && selectY >= 0 && selectY < 128) {
+    printf("select: %d %d\n", selectX, selectY);
+    printf("player: %f %f\n", floor(playerLeft), floor(playerTop));
+    if (!(selectX >= floor(playerLeft) && selectX <= floor(playerRight) &&
+          selectY >= floor(playerTop) && selectY <= floor(playerBottom))) {
+      if (world(selectX, selectY) == 0) {
+        world(selectX, selectY) = ID["stone"];
+      }
     }
   }
 }
@@ -180,7 +194,7 @@ void render(int delta) {
   solidrectangle(offsetX + playerX * 16, offsetY + playerY * 16,
                  offsetX + playerX * 16 + PLAYER_WIDTH,
                  offsetY + playerY * 16 + PLAYER_HEIGHT);
-  if (world.safeRead(selectX, selectY)) {
+  if (selectY >= 0 && selectY < 128) {
     setlinecolor(BLACK);
     rectangle(offsetX + selectX * 16, offsetY + selectY * 16,
               offsetX + selectX * 16 + 16, offsetY + selectY * 16 + 16);

@@ -15,7 +15,7 @@ map<string, int> ID = {
     {"copper_ore", 8},
     {"iron_ore", 9},
     {"deepslate", 10},
-    {"deepslate_gold", 11},
+    {"deepslate_gold_ore", 11},
     {"deepslate_emerald_ore", 12},
     {"deepslate_diamond_ore", 13},
 };
@@ -60,12 +60,18 @@ char& World::operator()(int x, int y) {
           chunk(cx, cy) = ID["grass_block"];
         else if (cy - h < 4)
           chunk(cx, cy) = ID["dirt"];
-        else if (cy - h < 32)
+        else if (cy - h < 32) {
           chunk(cx, cy) = ID["stone"];
-        else if (cy > 124)
-          chunk(cx, cy) = ID["bedrock"];
-        else
+          if (rand() % 1000 < 40) chunk(cx, cy) = ID["coal_ore"];
+          if (rand() % 1000 < 30) chunk(cx, cy) = ID["copper_ore"];
+          if (rand() % 1000 < 20) chunk(cx, cy) = ID["iron_ore"];
+        } else if (cy < 125) {
           chunk(cx, cy) = ID["deepslate"];
+          if (rand() % 1000 < 10) chunk(cx, cy) = ID["deepslate_gold_ore"];
+          if (rand() % 1000 < 5) chunk(cx, cy) = ID["deepslate_emerald_ore"];
+          if (rand() % 1000 < 1) chunk(cx, cy) = ID["deepslate_diamond_ore"];
+        } else
+          chunk(cx, cy) = ID["bedrock"];
       }
       if (cx == tree) {
         for (int i = 1; i < 4; i++) {
